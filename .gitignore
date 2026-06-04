@@ -1,3 +1,6 @@
+# Local Docker Compose secrets/paths (copy from .env.example)
+.env
+
 # this ignores all the "restart" files that are generated at run-time
 demo-data/*/output/*.nc
 input-staging-area/*
