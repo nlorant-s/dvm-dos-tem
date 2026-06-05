@@ -70,6 +70,10 @@ Check for equilibrium runs
 ===========================================
 After sensitivity is finished, it is important to check for equilibrium. The `equilibrium_check.py` is under development to check for it. This script filters model outputs that do not satisfy the equilibrium criteria defined in the script.  
 
+Post-hoc SA analysis (notebook)
+===========================================
+For interactive exploration of SA results (spaghetti plots, equilibrium checks, parameter–target relationships, nitrogen checks), use the Jupyter notebook [`notebooks/calibration_process.ipynb`](notebooks/calibration_process.ipynb). Run it inside the `dvmdostem-dev` or `dvmdostem-autocal` Docker container; set `WORK_DIR` in the notebook to the `work_dir` from your SA yaml (see [`sa-IMN-test.yaml`](sa-IMN-test.yaml) for an example path under `/data/workflows/`).
+
 
 Running the Calibration
 ===========================================

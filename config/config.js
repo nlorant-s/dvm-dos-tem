@@ -8,18 +8,18 @@
 
   "IO": {
     "parameter_dir":      "parameters/",
-    "hist_climate_file":  "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/historic-climate.nc",
-    "proj_climate_file":  "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/projected-climate.nc",
-    "veg_class_file":     "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/vegetation.nc",
-    "drainage_file":      "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/drainage.nc",
-    "soil_texture_file":  "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/soil-texture.nc",
-    "co2_file":           "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/co2.nc",
-    "proj_co2_file":      "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/projected-co2.nc",
-    "runmask_file":       "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/run-mask.nc",
-    "topo_file":          "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/topo.nc",
-    "fri_fire_file":      "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/fri-fire.nc",
-    "hist_exp_fire_file": "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/historic-explicit-fire.nc",
-    "proj_exp_fire_file": "demo-data/cru-ts40_ar5_rcp85_ncar-ccsm4_toolik_field_station_10x10/projected-explicit-fire.nc",
+    "hist_climate_file":  "/data/input-catalog/Imnavait/historic-climate.nc",
+    "proj_climate_file":  "/data/input-catalog/Imnavait/projected-climate.nc",
+    "veg_class_file":     "/data/input-catalog/Imnavait/vegetation.nc",
+    "drainage_file":      "/data/input-catalog/Imnavait/drainage.nc",
+    "soil_texture_file":  "/data/input-catalog/Imnavait/soil-texture.nc",
+    "co2_file":           "/data/input-catalog/Imnavait/co2.nc",
+    "proj_co2_file":      "/data/input-catalog/Imnavait/projected-co2.nc",
+    "runmask_file":       "/data/input-catalog/Imnavait/run-mask.nc",
+    "topo_file":          "/data/input-catalog/Imnavait/topo.nc",
+    "fri_fire_file":      "/data/input-catalog/Imnavait/fri-fire.nc",
+    "hist_exp_fire_file": "/data/input-catalog/Imnavait/historic-explicit-fire.nc",
+    "proj_exp_fire_file": "/data/input-catalog/Imnavait/projected-explicit-fire.nc",
     "output_dir":         "output/",
     "output_spec_file":   "config/output_spec.csv",
     "output_monthly":     1, //JSON specific
@@ -123,7 +123,7 @@
   },
 
   "model_settings": {
-    "cell_timelimit": 120, //Run time limit per cell in seconds. 0 for no limit.
+    "cell_timelimit": 3600, //Run time limit per cell in seconds. 0 for no limit.
     "dynamic_lai": 1,                   // from model (1) or from input (0)
     "baseline_start": 1901,  //start year for baseline EQ climate
     "baseline_end": 1931     //end year for baseline EQ climate
