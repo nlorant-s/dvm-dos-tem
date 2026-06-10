@@ -1,5 +1,7 @@
 # Step 1 Cmax Calibration — Cursor Agent Instruction Set
 
+Attach this file in Cursor (`@step1-cmax-agent.md`) when running the calibration agent.
+
 Automate **Step 1** of the MADS calibration workflow: calibrate **`cmax` per active PFT** against **`GPPAllIgnoringNitrogen`** field targets (modeled as NetCDF **`INGPP`**). Run entirely inside the `dvmdostem-autocal` Docker container. Do **not** proceed to Step 2.
 
 Reference workflow: [`notebooks/calibration_process.ipynb`](../notebooks/calibration_process.ipynb)  
