@@ -72,7 +72,7 @@ After sensitivity is finished, it is important to check for equilibrium. The `eq
 
 Post-hoc SA analysis (notebook)
 ===========================================
-For interactive exploration of SA results (spaghetti plots, equilibrium checks, parameter–target relationships, nitrogen checks), use the Jupyter notebook [`notebooks/calibration_process.ipynb`](notebooks/calibration_process.ipynb). Run it inside the `dvmdostem-dev` or `dvmdostem-autocal` Docker container; set `WORK_DIR` in the notebook to the `work_dir` from your SA yaml (see [`sa-IMN-test.yaml`](sa-IMN-test.yaml) for an example path under `/data/workflows/`).
+For interactive exploration of SA results (spaghetti plots, equilibrium checks, parameter–target relationships, nitrogen checks), use the Jupyter notebook [`notebooks/calibration_process.ipynb`](notebooks/calibration_process.ipynb). Run it inside the `dvmdostem-dev` or `dvmdostem-autocal` Docker container; set `WORK_DIR` in the notebook to the `work_dir` from your SA yaml (see [`manual_calibration/sa-IMN-step1.yaml`](manual_calibration/sa-IMN-step1.yaml) for an example path under `/data/workflows/`). For automated calibration, see [`agent_calibration/`](agent_calibration/).
 
 
 Running the Calibration
