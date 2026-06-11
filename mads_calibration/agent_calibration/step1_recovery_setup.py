@@ -2,15 +2,17 @@
 """
 Parameterized recovery seed setup for Step 1 cmax perturbation runs A–D.
 
-Generalizes manual_calibration/setup_recovery_seeds.py: accepts custom cmtnum, manifest path,
+Parameterized recovery seed setup: accepts custom cmtnum, manifest path,
 and reference optima from a prior step1_analyze.py result or hand-written yaml.
 
 Typical usage inside dvmdostem-autocal:
 
   python mads_calibration/agent_calibration/step1_recovery_setup.py \\
-    --manifest /data/workflows/CMT04-IMNAVIAT/recovery-manifest.yaml \\
+    --manifest /work/mads_calibration/agent_calibration/recovery_cmax_optima.yaml \\
+    --reference-cmax-yaml /data/workflows/CMT04-IMN-sa-N100/step1-result.yaml \\
+    --write-manifest /data/workflows/CMT04-IMN/recovery-manifest.yaml \\
     --cmtnum 4 \\
-    --dest-base /data/workflows/CMT04-IMNAVIAT \\
+    --dest-base /data/workflows/CMT04-IMN \\
     --runs A B C D
 
 Manifest format (same as recovery_cmax_optima.yaml):
@@ -180,7 +182,7 @@ def get_parser():
     )
     parser.add_argument(
         '--dest-base', required=True,
-        help='Base workflow dir for seed copies (e.g. /data/workflows/CMT04-IMNAVIAT)',
+        help='Base workflow dir for seed copies (e.g. /data/workflows/CMT04-IMN)',
     )
     parser.add_argument(
         '--runs',

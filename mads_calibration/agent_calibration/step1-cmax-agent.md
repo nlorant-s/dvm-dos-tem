@@ -2,10 +2,21 @@
 
 Attach this file in Cursor (`@step1-cmax-agent.md`) when running the calibration agent.
 
-Automate **Step 1** of the MADS calibration workflow: calibrate **`cmax` per active PFT** against **`GPPAllIgnoringNitrogen`** field targets (modeled as NetCDF **`INGPP`**). Run entirely inside the `dvmdostem-autocal` Docker container. Do **not** proceed to Step 2.
+Automate **Step 1** of the MADS calibration workflow: calibrate **`cmax` per active PFT** against **`GPPAllIgnoringNitrogen`** field targets (modeled as NetCDF **`INGPP`**). Run entirely inside the `dvmdostem-autocal` Docker container. Do **not** proceed to Step 2 from this instruction set.
 
-Reference workflow: [`notebooks/calibration_process.ipynb`](../notebooks/calibration_process.ipynb)  
-Production yaml template: [`manual_calibration/sa-IMN-step1.yaml`](../manual_calibration/sa-IMN-step1.yaml) (manual CMT04 Imnavait example)
+**Step 2** continues in [`agent_calibration_step2/`](../agent_calibration_step2/) — see [`step1-to-step2-transition.md`](../agent_calibration_step2/step1-to-step2-transition.md). Folder overview: [`README.md`](README.md).
+
+Reference notebook (interactive post-hoc analysis): [`notebooks/calibration_process.ipynb`](../notebooks/calibration_process.ipynb) — uses [`sa-step1-example-imn.yaml`](sa-step1-example-imn.yaml), not agent `logs/` paths.
+
+## Directory layout
+
+| Location | Tracked | Agent use |
+|----------|---------|-----------|
+| `agent_calibration/` (this folder) | Yes | Templates and scripts |
+| `logs/` | **No** (gitignored) | Created SA yamls (`sa-{site_label}-step1.yaml`, recovery A–D) and optional `{run_id}-step1-result.yaml` archive |
+| `/data/workflows/` | Runtime volume | SA outputs; canonical `step1-result.yaml` from `--json-out` |
+
+Copy [`sa-step1-template.yaml`](sa-step1-template.yaml) into `logs/` for each run. Do not commit `logs/`.
 
 ## Minimum user action
 
@@ -86,6 +97,7 @@ recovery_percent_diffs: 0.40 # wider search for perturbation runs
 | Recovery seed setup | `/work/mads_calibration/agent_calibration/step1_recovery_setup.py` | Perturbed seed dirs for runs A–D. |
 | Yaml template | `/work/mads_calibration/agent_calibration/sa-step1-template.yaml` | Parameterized Step 1 config template. |
 | Recovery manifest template | `/work/mads_calibration/agent_calibration/recovery_cmax_optima.yaml` | Bias tiers and run definitions for perturbation loop. |
+| Agent SA configs (per run) | `/work/mads_calibration/logs/sa-{site_label}-*.yaml` | Gitignored; created from template each calibration |
 | Archived reference params | `/work/mads_calibration/calibration_files/originals/CMT{NN}-*/` | Historical per-site parameter snapshots. |
 
 ### Observations vs initial parameters
@@ -128,7 +140,7 @@ Inspect `parameters/cmt_bgcvegetation.txt` for the CMT block. Include PFTs 0–8
 
 ### 1.2 Create Step 1 yaml
 
-Copy [`sa-step1-template.yaml`](sa-step1-template.yaml) to `mads_calibration/sa-{site_label}-step1.yaml` and fill placeholders:
+Copy [`sa-step1-template.yaml`](sa-step1-template.yaml) to `mads_calibration/logs/sa-{site_label}-step1.yaml` and fill placeholders:
 
 | Key | Value |
 |-----|-------|
@@ -147,7 +159,7 @@ Copy [`sa-step1-template.yaml`](sa-step1-template.yaml) to `mads_calibration/sa-
 
 ```bash
 docker compose exec -T dvmdostem-autocal bash -c \
-  'cd /work && python mads_calibration/SA_setup_and_run.py -f mads_calibration/sa-{site_label}-step1.yaml'
+  'cd /work && python mads_calibration/SA_setup_and_run.py -f mads_calibration/logs/sa-{site_label}-step1.yaml'
 ```
 
 - `-f` / `--force` clears existing `work_dir` before re-run.
@@ -163,10 +175,13 @@ Prefer the headless CLI (mirrors [`calibration_process.ipynb`](../notebooks/cali
 ```bash
 docker compose exec -T dvmdostem-autocal bash -c \
   'python /work/mads_calibration/agent_calibration/step1_analyze.py \
-    --work-dir /data/workflows/CMT04-IMNAVIAT-sa-N100/ \
+    --work-dir /data/workflows/CMT04-IMN-sa-N100/ \
     --rmse-threshold 10 \
-    --json-out /data/workflows/CMT04-IMNAVIAT-sa-N100/step1-result.json'
+    --config-yaml mads_calibration/logs/sa-IMN-step1.yaml \
+    --json-out /data/workflows/CMT04-IMN-sa-N100/step1-result.yaml'
 ```
+
+Use the `work_dir` from your Step 1 yaml. Match `--config-yaml` to the `logs/` SA config you created.
 
 **Important:** `n_top_runs` sorts ascending by R² — the **last** row is the best fit.
 
@@ -200,7 +215,7 @@ Extract `recommended_cmax` from the best sample's `cmax_*` columns in `sample_ma
 
 Follow the recovery pattern in [`recovery_cmax_optima.yaml`](recovery_cmax_optima.yaml). Use that file for **`bias_tiers`** and **`runs`** only — its bundled `reference_optima` are CMT04 Imnavait **examples** and must **not** be used as seeds for a new calibration.
 
-**Required:** pass `--reference-cmax-yaml` pointing to the baseline Phase 2 artifact (`step1-result.json` or `.yaml` from `--json-out`). That file's `recommended_cmax` becomes `reference_optima` for runs A–D. Without this flag, recovery seeds would be wrong.
+**Required:** pass `--reference-cmax-yaml` pointing to the baseline Step 1 artifact (`step1-result.yaml` from `--json-out` under the baseline `work_dir`). That file's `recommended_cmax` becomes `reference_optima` for runs A–D. Without this flag, recovery seeds would be wrong.
 
 Steps:
 
@@ -212,19 +227,21 @@ Steps:
 docker compose exec -T dvmdostem-autocal bash -c \
   'python /work/mads_calibration/agent_calibration/step1_recovery_setup.py \
     --manifest /work/mads_calibration/agent_calibration/recovery_cmax_optima.yaml \
-    --reference-cmax-yaml /data/workflows/CMT04-IMNAVIAT-sa-N100/step1-result.json \
-    --write-manifest /data/workflows/CMT04-IMNAVIAT/recovery-manifest.yaml \
+    --reference-cmax-yaml /data/workflows/CMT04-IMN-sa-N100/step1-result.yaml \
+    --write-manifest /data/workflows/CMT04-IMN/recovery-manifest.yaml \
     --cmtnum 4 \
-    --dest-base /data/workflows/CMT04-IMNAVIAT \
+    --dest-base /data/workflows/CMT04-IMN \
     --runs A B C D'
 ```
+
+`dest-base` is `/data/workflows/CMT{cmtnum:02d}-{site_label}` (e.g. `CMT04-IMN`).
 
 `--write-manifest` saves the merged yaml (template tiers + your `recommended_cmax`) for audit; seed dirs are written under `dest-base`.
 
 For each run A–D:
 
 1. Point `seed_path` to `parameters-recovery-{A|B|C|D}` under `dest-base`.
-2. Create `sa-{site_label}-recovery-{A|B|C|D}.yaml` with `percent_diffs: 0.40`, unique `work_dir`.
+2. Create `logs/sa-{site_label}-recovery-{A|B|C|D}.yaml` with `percent_diffs: 0.40`, unique `work_dir`.
 3. Run SA and analyze with `step1_analyze.py`.
 4. Track global best RMSE across baseline + all perturbation runs.
 
@@ -234,7 +251,7 @@ After all runs, select the global best. Report even if none meet RMSE < 10.
 
 ## Output Contract
 
-Write a YAML/JSON artifact to `{work_dir}/step1-result.yaml`:
+Write a YAML/JSON artifact via `step1_analyze.py --json-out` to `{work_dir}/step1-result.yaml` (canonical runtime path under `/data/workflows/`). After the full baseline + recovery loop, copy the consolidated result to `mads_calibration/logs/{run_id}-step1-result.yaml` (gitignored local archive).
 
 ```yaml
 run_id: CMT04-IMN-step1
@@ -242,8 +259,8 @@ status: pass          # pass | best_effort
 best_rmse: 7.42
 best_r2: 0.91
 best_sample_index: 42
-work_dir: /data/workflows/CMT04-IMNAVIAT-sa-N100/
-config_yaml: mads_calibration/manual_calibration/sa-IMN-step1.yaml
+work_dir: /data/workflows/CMT04-IMN-sa-recovery-C/
+config_yaml: mads_calibration/logs/sa-IMN-recovery-C.yaml
 n_eq_passing: 87
 n_total_samples: 100
 recommended_cmax:
@@ -286,6 +303,7 @@ notes: ""
 - Run `pip install` inside the container.
 - Modify `calibration/calibration_targets.py`.
 - Commit secrets or `.env` credentials.
+- Commit `logs/` (gitignored local run artifacts).
 - Use `sa-config-demo.yaml` — correct name is `sa-demo-config.yaml`.
 
 ---
@@ -296,4 +314,6 @@ notes: ""
 |------------------------|--------------|
 | `calibration-process.ipynb` | `mads_calibration/notebooks/calibration_process.ipynb` |
 | `sa-config-demo.yaml` | `mads_calibration/sa-demo-config.yaml` |
-| Manual Step 1 (CMT04 Imnavait) | `mads_calibration/manual_calibration/sa-IMN-step1.yaml` |
+| Notebook Step 1 example (CMT04 Imnavait) | `mads_calibration/agent_calibration/sa-step1-example-imn.yaml` |
+| Agent Step 1 / recovery SA configs | `mads_calibration/logs/sa-{SITE}-step1.yaml`, `logs/sa-{SITE}-recovery-{A,B,C,D}.yaml` |
+| Agent Step 1 result artifacts | `{work_dir}/step1-result.yaml`; archive copy in `logs/{run_id}-step1-result.yaml` |

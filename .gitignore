@@ -53,6 +53,12 @@ Debug/*
 
 .vagrant/*
 
+# Agent-run SA configs (Step 1 recovery, Step 2 iterations, etc.)
+mads_calibration/logs/
+
+# Local / personal manual calibration workflow (not part of agent automation)
+mads_calibration/manual_calibration/
+
 # assorted temporary stuff
 bundle*
 

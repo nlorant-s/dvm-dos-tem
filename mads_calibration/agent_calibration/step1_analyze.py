@@ -8,9 +8,10 @@ Mirrors the analysis cells in notebooks/calibration_process.ipynb:
 Typical usage inside dvmdostem-autocal:
 
   python mads_calibration/agent_calibration/step1_analyze.py \\
-    --work-dir /data/workflows/CMT04-IMNAVIAT-sa-N100/ \\
+    --work-dir /data/workflows/CMT04-IMN-sa-N100/ \\
     --rmse-threshold 10 \\
-    --json-out /data/workflows/CMT04-IMNAVIAT-sa-N100/step1-result.json
+    --config-yaml mads_calibration/logs/sa-IMN-step1.yaml \\
+    --json-out /data/workflows/CMT04-IMN-sa-N100/step1-result.yaml
 """
 
 from __future__ import print_function
