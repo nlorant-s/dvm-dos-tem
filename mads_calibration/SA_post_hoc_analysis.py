@@ -1785,7 +1785,7 @@ def generate_eq_lim_dict(targets, cv_lim=[0], eps_lim=[0], slope_lim=[0]):
 
   '''
     
-  if (len(targets.columns) != len(cv_lim)) or (len(targets.columns) != len(p_lim)) or (len(targets.columns) != len(slope_lim)):
+  if (len(targets.columns) != len(cv_lim)) or (len(targets.columns) != len(eps_lim)) or (len(targets.columns) != len(slope_lim)):
     print('cv_lim, eps_lim, and slope_lim must be lists with the same length as the number of targets')
     print(' DEFAULTS HAVE BEEN USED cv lim = 15%, eps_lim = 1e-5, slope lim = 1e-3')
     cv_lim = np.repeat(1, len(targets.columns)); eps_lim = np.repeat(1e-5, len(targets.columns)); slope_lim = np.repeat(1e-3, len(targets.columns))
