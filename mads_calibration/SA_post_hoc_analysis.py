@@ -518,7 +518,7 @@ def calc_metrics(results, targets):
   #    r2 = [sklm.r2_score(targets.T, sample, sample_weight=weights_by_targets) for i,sample in results.iterrows()]
 
   r2 = [sklm.r2_score(targets.T, sample) for i,sample in results.iterrows()] 
-  rmse = [sklm.mean_squared_error(targets.T, sample, squared=False) for i,sample in results.iterrows()]
+  rmse = [np.sqrt(sklm.mean_squared_error(targets.T, sample)) for i,sample in results.iterrows()]
   mape = [sklm.mean_absolute_percentage_error(targets.T, sample) for i,sample in results.iterrows()]
   
   re = [(100*(targets - sample)/sample) for i,sample in results.iterrows()] 
@@ -1904,9 +1904,9 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
         cv = 100 * output[-30:,0,0].std() / output[-30:,0,0].mean()
         eps = abs(output[-30:,0,0].mean() - output[-60:-30,0,0].mean())
     
-        eq_metrics[targ+f'_slope'].loc[n] = slope
-        eq_metrics[targ+f'_eps'].loc[n] = eps
-        eq_metrics[targ+f'_cv'].loc[n] = cv
+        eq_metrics.loc[n, targ+f'_slope'] = slope
+        eq_metrics.loc[n, targ+f'_eps'] = eps
+        eq_metrics.loc[n, targ+f'_cv'] = cv
 
         if lim_dict!=False:
           cv_lim=lim_dict[targ+'_cv_lim']
@@ -1914,18 +1914,18 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
           slope_lim = lim_dict[targ+'_slope_lim']
 
         if slope < slope_lim * output[-30:,0,0].mean()/30:
-          eq_data[targ+f'_slope'].loc[n] = True
+          eq_data.loc[n, targ+f'_slope'] = True
         if eps <= abs(output[-60:-30,0,0].mean() - output[-90:-60,0,0].mean()) + eps_lim * output[-30:,0,0].std() or output[-30:,0,0].mean()*1e-6: 
         
-          eq_data[targ+f'_eps'].loc[n] = True
+          eq_data.loc[n, targ+f'_eps'] = True
         if cv < cv_lim:
-          eq_data[targ+f'_cv'].loc[n] = True
+          eq_data.loc[n, targ+f'_cv'] = True
 
-        if ((eq_data[targ+f'_slope'].loc[n] == True) & 
-            (eq_data[targ+f'_eps'].loc[n] == True) & 
-            (eq_data[targ+f'_cv'].loc[n] == True)):
+        if ((eq_data.loc[n, targ+f'_slope'] == True) & 
+            (eq_data.loc[n, targ+f'_eps'] == True) & 
+            (eq_data.loc[n, targ+f'_cv'] == True)):
 
-          eq_var_check[targ].loc[n] = True
+          eq_var_check.loc[n, targ] = True
             
       # variable with pft but no compartment
       if len(targ_var_info[0]) == 2:
@@ -1938,9 +1938,9 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
           cv = 100 * output[-30:,pft,0,0].std() / output[-30:,pft,0,0].mean()
           eps = abs(output[-30:,pft,0,0].mean() - output[-60:-30,pft,0,0].mean())
 
-          eq_metrics[targ+f'_pft{pft}_slope'].loc[n] = slope
-          eq_metrics[targ+f'_pft{pft}_eps'].loc[n] = eps
-          eq_metrics[targ+f'_pft{pft}_cv'].loc[n] = cv
+          eq_metrics.loc[n, targ+f'_pft{pft}_slope'] = slope
+          eq_metrics.loc[n, targ+f'_pft{pft}_eps'] = eps
+          eq_metrics.loc[n, targ+f'_pft{pft}_cv'] = cv
 
           if lim_dict!=False:
             cv_lim = lim_dict[targ+f'_pft{pft}_cv_lim']
@@ -1948,17 +1948,17 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
             slope_lim = lim_dict[targ+f'_pft{pft}_slope_lim']
 
           if slope < slope_lim * output[-30:,pft,0,0].mean()/30:
-            eq_data[targ+f'_pft{pft}_slope'].loc[n] = True
+            eq_data.loc[n, targ+f'_pft{pft}_slope'] = True
           if eps <= abs(output[-60:-30,pft,0,0].mean() - output[-90:-60,pft,0,0].mean()) + eps_lim * output[-30:,pft,0,0].std() or output[-30:,pft,0,0].mean()*1e-6:
-            eq_data[targ+f'_pft{pft}_eps'].loc[n] = True
+            eq_data.loc[n, targ+f'_pft{pft}_eps'] = True
           if cv < cv_lim:
-            eq_data[targ+f'_pft{pft}_cv'].loc[n] = True
+            eq_data.loc[n, targ+f'_pft{pft}_cv'] = True
 
-          if ((eq_data[targ+f'_pft{pft}_slope'].loc[n] == True) & 
-              (eq_data[targ+f'_pft{pft}_eps'].loc[n] == True) & 
-              (eq_data[targ+f'_pft{pft}_cv'].loc[n] == True)):
+          if ((eq_data.loc[n, targ+f'_pft{pft}_slope'] == True) & 
+              (eq_data.loc[n, targ+f'_pft{pft}_eps'] == True) & 
+              (eq_data.loc[n, targ+f'_pft{pft}_cv'] == True)):
 
-            eq_var_check[targ+f'_pft{pft}'].loc[n] = True
+            eq_var_check.loc[n, targ+f'_pft{pft}'] = True
 
       # variable with pfts and compartments
       if len(targ_var_info[0]) == 3:
@@ -1973,9 +1973,9 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
           cv = 100 * output[-30:,comp_index,pft,0,0].std() / output[-30:,comp_index,pft,0,0].mean()
           eps = abs(output[-30:,comp_index,pft,0,0].mean() - output[-60:-30,comp_index,pft,0,0].mean())
 
-          eq_metrics[targ+f'_pft{pft}_{comp}_slope'].loc[n] = slope
-          eq_metrics[targ+f'_pft{pft}_{comp}_eps'].loc[n] = eps
-          eq_metrics[targ+f'_pft{pft}_{comp}_cv'].loc[n] = cv
+          eq_metrics.loc[n, targ+f'_pft{pft}_{comp}_slope'] = slope
+          eq_metrics.loc[n, targ+f'_pft{pft}_{comp}_eps'] = eps
+          eq_metrics.loc[n, targ+f'_pft{pft}_{comp}_cv'] = cv
 
           if lim_dict!=False:
             cv_lim=lim_dict[targ+f'_pft{pft}_{comp}_cv_lim']
@@ -1983,23 +1983,23 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
             slope_lim = lim_dict[targ+f'_pft{pft}_{comp}_slope_lim']
 
           if slope < slope_lim * output[-30:,comp_index,pft,0,0].mean()/30:
-            eq_data[targ+f'_pft{pft}_{comp}_slope'].loc[n] = True
+            eq_data.loc[n, targ+f'_pft{pft}_{comp}_slope'] = True
           if eps <= abs(output[-60:-30,comp_index,pft,0,0].mean() - output[-90:-60,comp_index,pft,0,0].mean()) + eps_lim * output[-30:,comp_index,pft,0,0].std() or output[-30:, comp_index,pft,0,0].mean()*1e-6:
-            eq_data[targ+f'_pft{pft}_{comp}_eps'].loc[n] = True
+            eq_data.loc[n, targ+f'_pft{pft}_{comp}_eps'] = True
           if cv < cv_lim:
-            eq_data[targ+f'_pft{pft}_{comp}_cv'].loc[n] = True
+            eq_data.loc[n, targ+f'_pft{pft}_{comp}_cv'] = True
 
-          if ((eq_data[targ+f'_pft{pft}_{comp}_slope'].loc[n] == True) & 
-              (eq_data[targ+f'_pft{pft}_{comp}_eps'].loc[n] == True) & 
-              (eq_data[targ+f'_pft{pft}_{comp}_cv'].loc[n] == True)):
+          if ((eq_data.loc[n, targ+f'_pft{pft}_{comp}_slope'] == True) & 
+              (eq_data.loc[n, targ+f'_pft{pft}_{comp}_eps'] == True) & 
+              (eq_data.loc[n, targ+f'_pft{pft}_{comp}_cv'] == True)):
 
-            eq_var_check[targ+f'_pft{pft}_{comp}'].loc[n] = True
+            eq_var_check.loc[n, targ+f'_pft{pft}_{comp}'] = True
 
     if eq_var_check.iloc[n, :].all() == True:
-      eq_check.loc[n] = True
+      eq_check.loc[n, 'result'] = True
   
-  counts = eq_var_check.apply(pd.value_counts).replace(np.nan, 0.0)
-  total_counts = eq_check.apply(pd.value_counts).replace(np.nan, 0.0)
+  counts = eq_var_check.apply(lambda s: s.value_counts()).replace(np.nan, 0.0)
+  total_counts = eq_check.apply(lambda s: s.value_counts()).replace(np.nan, 0.0)
   
   # add catch for only True / only False:
   if len(counts.index)==1:
@@ -2014,7 +2014,7 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
       counts.index = ['pass', 'fail']
       
   # converting result into percentage
-  counts = counts / counts.sum()[0] * 100
+  counts = counts.div(counts.sum(axis=0), axis=1) * 100
   
   # add catch for only True / only False:
   if len(total_counts.index)==1:
@@ -2028,7 +2028,7 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
     else:
       total_counts.index = ['pass', 'fail']
   # converting result into percentage
-  total_counts = total_counts / total_counts.sum()[0] * 100
+  total_counts = total_counts.div(total_counts.sum(axis=0), axis=1) * 100
   
   fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(12,6))
   
@@ -2045,14 +2045,16 @@ def equilibrium_check(path, cv_lim=1, eps_lim = 1e-5, slope_lim = 1e-3, lim_dict
   ax[1].set_ylabel(" Equilibrium pass / fail [%] ", fontsize=12)
   
   for i, col in enumerate(counts.columns):
-    plt.annotate(str(int(counts[counts.index=='pass'][col].values))+'%', xy=(i+0.75, counts[counts.index=='pass'][col].values+2),
+    pass_pct = float(counts.loc['pass', col])
+    plt.annotate(str(int(pass_pct))+'%', xy=(i+0.75, pass_pct+2),
                   rotation=90, fontsize=8)
   
-  plt.suptitle(f"{int(total_counts[total_counts.index=='pass'].values)}% pass", fontsize=16)
+  plt.suptitle(f"{int(float(total_counts.loc['pass', 'result']))}% pass", fontsize=16)
   plt.legend(loc='upper left', fontsize=12, bbox_to_anchor=(-0.5,1))
 
   if save:
     plt.savefig(saveprefix + col.split('_')[0] +"_eq_plot.png", bbox_inches='tight')
+  plt.close(fig)
 
   if lim_dict==False:
     lim_dict = {

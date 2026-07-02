@@ -38,8 +38,8 @@ import sys
 import yaml
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-MADS_CALIB_DIR = os.path.dirname(SCRIPT_DIR)
-REPO_ROOT = os.path.dirname(MADS_CALIB_DIR)
+MADS_CALIB_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
+REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..'))
 SCRIPTS_DIR = os.path.join(REPO_ROOT, 'scripts')
 if os.path.isdir(SCRIPTS_DIR) and SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, SCRIPTS_DIR)

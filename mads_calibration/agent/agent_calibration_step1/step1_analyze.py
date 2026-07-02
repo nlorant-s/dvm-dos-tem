@@ -25,7 +25,7 @@ import pandas as pd
 import yaml
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-MADS_CALIB_DIR = os.path.dirname(SCRIPT_DIR)
+MADS_CALIB_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
 if MADS_CALIB_DIR not in sys.path:
     sys.path.insert(0, MADS_CALIB_DIR)
 
