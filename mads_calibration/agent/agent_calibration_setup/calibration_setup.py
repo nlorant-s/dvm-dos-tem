@@ -28,7 +28,8 @@ import yaml
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MADS_CALIB_DIR = os.path.dirname(SCRIPT_DIR)
-REPO_ROOT = os.path.dirname(MADS_CALIB_DIR)
+# agent/agent_calibration_setup -> agent -> mads_calibration -> repo root (/work)
+REPO_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..', '..'))
 SCRIPTS_DIR = os.path.join(REPO_ROOT, 'scripts')
 if SCRIPTS_DIR not in sys.path:
     sys.path.insert(0, SCRIPTS_DIR)
@@ -288,8 +289,15 @@ def print_discover_table(rows):
 
 def discover(input_bucket, param_bucket):
     input_sites = list_input_sites(input_bucket)
-    param_folders = list_param_folders(param_bucket)
     aliases = load_aliases()
+    try:
+        param_folders = list_param_folders(param_bucket)
+    except RuntimeError as exc:
+        param_folders = sorted({
+            folder for folders in aliases.values() for folder in folders
+        })
+        print('Param bucket listing failed: {}'.format(exc))
+        print('Using site_aliases.yaml candidates only.\n')
     rows = build_crosswalk(input_sites, param_folders, aliases)
     print('Input bucket:  {}'.format(input_bucket))
     print('Param bucket:  {}'.format(param_bucket))
@@ -320,7 +328,15 @@ def setup_site(args):
             folder for folders in aliases.values() for folder in folders
         })
     else:
-        param_folders = list_param_folders(args.param_bucket)
+        try:
+            param_folders = list_param_folders(args.param_bucket)
+        except RuntimeError as exc:
+            param_folders = sorted({
+                folder for folders in aliases.values() for folder in folders
+            })
+            warnings.append(
+                'Param bucket listing failed ({}); using site_aliases.yaml '
+                'candidates only.'.format(exc))
     param_folder, all_candidates = resolve_param_folder(
         args.site_name, args.cmtnum, param_folders, aliases)
 
